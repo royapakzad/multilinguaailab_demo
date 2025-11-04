@@ -755,7 +755,7 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
                         <label htmlFor="custom_scenario_prompt" className="block text-sm font-medium text-foreground mb-1">Enter Custom Scenario Prompt (English)</label>
                         <textarea id="custom_scenario_prompt" rows={4} value={promptA} onChange={e => { setPromptA(e.target.value); resetForNewRun(); }}
                             className="form-textarea w-full p-2 border rounded-md shadow-sm bg-card border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm font-mono"
-                            placeholder="e.g., 'My Greek asylum card will expire in 20 days... Is there another way?'" />
+                            placeholder="Enter your custom scenario prompt here..." />
                     </div>
                 ) : inputMode === 'sample' ? (
                     <div className="space-y-3">
