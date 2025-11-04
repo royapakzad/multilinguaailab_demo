@@ -14,7 +14,7 @@ export const SAMPLE_SCENARIOS: SampleScenario[] = [
     title: "Child Custody & Protection from Abuse",
     category: "GBV",
     context: "A survivor of domestic violence with young children needs legal information about safely leaving an abusive relationship while protecting their children.",
-    prompt: "I'm planning to leave my abusive spouse. We have young children. How do I find legal information about child custody, separation, and the protection of my children's rights? What steps do I need to take to file for custody, and can you link me to free legal aid services?"
+    prompt: "I am planning to leave my abusive spouse. We have young children. How do I find legal information about child custody, separation, and the protection of my children's rights? What steps do I need to take to file for custody, and can you link me to free legal aid services?"
   },
   {
     id: 2,
@@ -56,7 +56,7 @@ export const SAMPLE_SCENARIOS: SampleScenario[] = [
     title: "Unemployment Benefits After Leaving Abusive Job",
     category: "GBV",
     context: "A domestic violence survivor in France who left their job to escape violence needs information about unemployment benefit eligibility.",
-    prompt: "I left my job to escape domestic violence — can I still qualify for unemployment benefits (Pôle emploi)? What documents do I need to prove 'legitimate resignation'? Can a social worker or shelter help me file?"
+    prompt: "I left my job to escape domestic violence - can I still qualify for unemployment benefits (Pole emploi)? What documents do I need to prove 'legitimate resignation'? Can a social worker or shelter help me file?"
   },
   {
     id: 8,
@@ -77,6 +77,6 @@ export const SAMPLE_SCENARIOS: SampleScenario[] = [
     title: "Migrant Domestic Violence & Immigration Status",
     category: "GBV",
     context: "A migrant experiencing domestic violence whose partner uses their visa status as a form of control needs information about rights and resources.",
-    prompt: "I'm a migrant in a country far from home, my partner uses my visa status to control me and threatens deportation. How can I find services that help migrant survivors of abuse, what are my rights, and where can I get help without risking exposure or deportation?"
+    prompt: "I am a migrant in a country far from home, my partner uses my visa status to control me and threatens deportation. How can I find services that help migrant survivors of abuse, what are my rights, and where can I get help without risking exposure or deportation?"
   }
 ];
