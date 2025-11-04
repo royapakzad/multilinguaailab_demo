@@ -11,10 +11,11 @@ import {
     LanguageSpecificRubricScores, HarmDisparityMetrics, 
     VerifiableEntity, RubricDimension, CsvScenario, LlmEvaluation
 } from '../types';
-import { 
-    EVALUATIONS_KEY, AVAILABLE_MODELS, REASONING_SYSTEM_INSTRUCTION, 
+import {
+    EVALUATIONS_KEY, AVAILABLE_MODELS, REASONING_SYSTEM_INSTRUCTION,
     INITIAL_LANGUAGE_SPECIFIC_RUBRIC_SCORES, INITIAL_HARM_DISPARITY_METRICS,
-    AVAILABLE_NATIVE_LANGUAGES, RUBRIC_DIMENSIONS, HARM_SCALE, YES_NO_UNSURE_OPTIONS, DISPARITY_CRITERIA
+    AVAILABLE_NATIVE_LANGUAGES, RUBRIC_DIMENSIONS, HARM_SCALE, YES_NO_UNSURE_OPTIONS, DISPARITY_CRITERIA,
+    SAMPLE_SCENARIOS, SampleScenario
 } from '../constants';
 import * as config from '../env.js';
 import LoadingSpinner from './LoadingSpinner';
@@ -173,10 +174,11 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
   const [searchQuery, setSearchQuery] = useState<string>('');
 
   // Input Mode State
-  const [inputMode, setInputMode] = useState<'custom' | 'csv'>('custom');
+  const [inputMode, setInputMode] = useState<'custom' | 'csv' | 'sample'>('custom');
   const [csvScenarios, setCsvScenarios] = useState<CsvScenario[]>([]);
   const [selectedCsvScenarioId, setSelectedCsvScenarioId] = useState<string>('');
   const [csvError, setCsvError] = useState<string | null>(null);
+  const [selectedSampleScenarioId, setSelectedSampleScenarioId] = useState<string>('');
   const [currentScenarioContext, setCurrentScenarioContext] = useState<string>('');
 
   // Language State
@@ -462,8 +464,10 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
     const existingRecord = isUpdating ? allEvaluations.find(ev => ev.id === editingEvaluationId) : undefined;
     
     const langInfo = AVAILABLE_NATIVE_LANGUAGES.find(l => l.code === selectedNativeLanguageCode);
-    const scenarioId = inputMode === 'csv' ? `csv-scenario-${selectedCsvScenarioId}` : 'custom';
-    const scenarioCategory = inputMode === 'csv' ? 'CSV Upload' : 'Custom';
+    const scenarioId = inputMode === 'csv' ? `csv-scenario-${selectedCsvScenarioId}` :
+                      inputMode === 'sample' ? `sample-scenario-${selectedSampleScenarioId}` : 'custom';
+    const scenarioCategory = inputMode === 'csv' ? 'CSV Upload' :
+                            inputMode === 'sample' ? 'Sample Scenario' : 'Custom';
     
     const recordData: ReasoningEvaluationRecord = {
         id: isUpdating ? editingEvaluationId! : `${new Date().toISOString()}-reasoning-${Math.random().toString(16).slice(2)}`,
@@ -513,7 +517,7 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
         alert(isUpdating ? "Evaluation updated successfully!" : "Human evaluation saved! Now getting LLM evaluation in the background...");
 
         resetForNewRun();
-        setPromptA(''); setPromptB(''); setCurrentScenarioContext(''); setSelectedCsvScenarioId('');
+        setPromptA(''); setPromptB(''); setCurrentScenarioContext(''); setSelectedCsvScenarioId(''); setSelectedSampleScenarioId('');
         
         if (!isUpdating) {
             (async () => {
@@ -654,6 +658,17 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
         }
     }
   }, [selectedCsvScenarioId, csvScenarios, inputMode]);
+
+  useEffect(() => {
+    if (inputMode === 'sample' && selectedSampleScenarioId) {
+        const scenario = SAMPLE_SCENARIOS.find(s => s.id === parseInt(selectedSampleScenarioId, 10));
+        if (scenario) {
+            setPromptA(scenario.prompt);
+            setCurrentScenarioContext(scenario.context);
+            resetForNewRun();
+        }
+    }
+  }, [selectedSampleScenarioId, inputMode]);
   
   const downloadCSV = () => {
     if (visibleEvaluations.length === 0) return alert("No data to export.");
@@ -723,13 +738,13 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
                  <div className="flex items-center space-x-4">
                     <h3 className="text-md font-semibold text-foreground">Scenario Input Method</h3>
                     <div className="flex items-center space-x-2 bg-muted p-1 rounded-lg">
-                        {(['custom', 'csv'] as const).map(mode => (
+                        {(['custom', 'sample', 'csv'] as const).map(mode => (
                             <button
                                 key={mode}
-                                onClick={() => { setInputMode(mode); setPromptA(''); setPromptB(''); setSelectedCsvScenarioId(''); setCurrentScenarioContext(''); }}
+                                onClick={() => { setInputMode(mode); setPromptA(''); setPromptB(''); setSelectedCsvScenarioId(''); setSelectedSampleScenarioId(''); setCurrentScenarioContext(''); }}
                                 className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${inputMode === mode ? 'bg-background shadow-sm text-primary' : 'text-muted-foreground hover:bg-background/50'}`}
                             >
-                                {mode === 'custom' ? 'Custom Scenario' : 'Upload CSV'}
+                                {mode === 'custom' ? 'Custom Scenario' : mode === 'sample' ? 'Sample Scenarios' : 'Upload CSV'}
                             </button>
                         ))}
                     </div>
@@ -740,7 +755,51 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
                         <label htmlFor="custom_scenario_prompt" className="block text-sm font-medium text-foreground mb-1">Enter Custom Scenario Prompt (English)</label>
                         <textarea id="custom_scenario_prompt" rows={4} value={promptA} onChange={e => { setPromptA(e.target.value); resetForNewRun(); }}
                             className="form-textarea w-full p-2 border rounded-md shadow-sm bg-card border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm font-mono"
-                            placeholder="e.g., “My Greek asylum card will expire in 20 days... Is there another way?”" />
+                            placeholder="e.g., "My Greek asylum card will expire in 20 days... Is there another way?"" />
+                    </div>
+                ) : inputMode === 'sample' ? (
+                    <div className="space-y-3">
+                        <div>
+                            <label htmlFor="sample-scenario-select" className="block text-sm font-medium text-foreground mb-1">Select Sample Scenario ({SAMPLE_SCENARIOS.length} available)</label>
+                            <p className="text-xs text-muted-foreground mb-2">Choose from pre-loaded scenarios covering GBV, Migration, and Government Services topics.</p>
+                            <select
+                                id="sample-scenario-select"
+                                value={selectedSampleScenarioId}
+                                onChange={e => setSelectedSampleScenarioId(e.target.value)}
+                                className="form-select w-full p-2 border rounded-md shadow-sm bg-card border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm"
+                            >
+                                <option value="">-- Choose a sample scenario --</option>
+                                {SAMPLE_SCENARIOS.map(s => (
+                                    <option key={s.id} value={s.id}>
+                                        {s.category} - {s.title}: {s.prompt.substring(0, 60)}...
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        {selectedSampleScenarioId && (
+                            <div className="space-y-3">
+                                <div className="p-3 bg-muted rounded-lg">
+                                    <h4 className="text-sm font-semibold text-foreground mb-1">Selected Scenario Context:</h4>
+                                    <p className="text-xs text-muted-foreground italic">
+                                        {SAMPLE_SCENARIOS.find(s => s.id === parseInt(selectedSampleScenarioId))?.context}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label htmlFor="sample_scenario_prompt" className="block text-sm font-medium text-foreground mb-1">
+                                        Sample Scenario Prompt (Editable)
+                                    </label>
+                                    <p className="text-xs text-muted-foreground mb-2">You can modify this prompt as needed before running the experiment.</p>
+                                    <textarea
+                                        id="sample_scenario_prompt"
+                                        rows={4}
+                                        value={promptA}
+                                        onChange={e => { setPromptA(e.target.value); resetForNewRun(); }}
+                                        className="form-textarea w-full p-2 border rounded-md shadow-sm bg-card border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm font-mono"
+                                        placeholder="Sample scenario prompt will appear here..."
+                                    />
+                                </div>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div className="space-y-3">
