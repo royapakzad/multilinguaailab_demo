@@ -755,7 +755,7 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
                         <label htmlFor="custom_scenario_prompt" className="block text-sm font-medium text-foreground mb-1">Enter Custom Scenario Prompt (English)</label>
                         <textarea id="custom_scenario_prompt" rows={4} value={promptA} onChange={e => { setPromptA(e.target.value); resetForNewRun(); }}
                             className="form-textarea w-full p-2 border rounded-md shadow-sm bg-card border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm font-mono"
-                            placeholder="Enter your custom scenario prompt here..." />
+                            placeholder={`Enter your custom scenario prompt here...`} />
                     </div>
                 ) : inputMode === 'sample' ? (
                     <div className="space-y-3">
@@ -795,7 +795,7 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
                                         value={promptA}
                                         onChange={e => { setPromptA(e.target.value); resetForNewRun(); }}
                                         className="form-textarea w-full p-2 border rounded-md shadow-sm bg-card border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm font-mono"
-                                        placeholder="Sample scenario prompt will appear here..."
+                                        placeholder={`Sample scenario prompt will appear here...`}
                                     />
                                 </div>
                             </div>
@@ -891,7 +891,7 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
               <div className="relative max-w-md">
                 <input
                   type="text"
-                  placeholder="Search scenarios by prompt, context, title, or evaluator..."
+                  placeholder={`Search scenarios by prompt, context, title, or evaluator...`}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-card focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent text-sm"
