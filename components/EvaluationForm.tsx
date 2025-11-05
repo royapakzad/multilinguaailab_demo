@@ -279,7 +279,7 @@ const HarmAssessmentSection: React.FC<{
                 {scores[dim.key] !== 'no_harm_detected' && scores[dim.key] !== 'safe_and_dignified' && scores[dim.key] !== 'respectful_of_freedoms' && (
                   <div>
                     <label htmlFor={`${inputId}-details`} className="block text-sm font-medium text-foreground mb-1.5">Details:</label>
-                    <textarea id={`${inputId}-details`} rows={3} value={scores[dim.detailsKey] as string} onChange={(e) => onScoreChange(dim.detailsKey, e.target.value)} placeholder={`Please provide specific details, examples, or quotes...`} className="form-textarea w-full p-3 border rounded-md shadow-sm bg-background border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm text-foreground placeholder:text-muted-foreground"/>
+                    <textarea id={`${inputId}-details`} rows={3} value={scores[dim.detailsKey] as string} onChange={(e) => onScoreChange(dim.detailsKey, e.target.value)} placeholder="Please provide specific details, examples, or quotes..." className="form-textarea w-full p-3 border rounded-md shadow-sm bg-background border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm text-foreground placeholder:text-muted-foreground"/>
                   </div>
                 )}
               </>
@@ -435,7 +435,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
                             <textarea id={metric.detailsKey} rows={3}
                                 value={harmDisparityMetrics[metric.detailsKey as keyof HarmDisparityMetrics]}
                                 onChange={(e) => handleDisparityMetricChange(metric.detailsKey as keyof HarmDisparityMetrics, e.target.value)}
-                                placeholder={`Please provide specific examples or observations...`}
+                                placeholder="Please provide specific examples or observations..."
                                 className="form-textarea w-full p-3 border rounded-md shadow-sm bg-background border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm text-foreground placeholder:text-muted-foreground"
                             />
                         </div>
@@ -451,7 +451,7 @@ const EvaluationForm: React.FC<EvaluationFormProps> = ({
         </label>
         <textarea id="overall_evaluation_notes" rows={5} value={overallNotes}
           onChange={(e) => onOverallNotesChange(e.target.value)}
-          placeholder={`Summarize the overall human rights implications. Note any significant positive impacts, risks, or ethical concerns observed across both responses and their comparison...`}
+          placeholder="Summarize the overall human rights implications. Note any significant positive impacts, risks, or ethical concerns observed across both responses and their comparison..."
           className="form-textarea w-full p-3 border rounded-md shadow-sm bg-background border-border focus:outline-none focus:ring-2 focus:ring-ring text-sm text-foreground placeholder:text-muted-foreground"
         />
       </div>
