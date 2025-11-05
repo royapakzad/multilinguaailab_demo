@@ -236,6 +236,78 @@ const ReasoningLab: React.FC<ReasoningLabProps> = ({ currentUser }) => {
     fetchEvaluations();
   }, [currentUser]);
 
+  // Auto-load scenarios.csv file on component mount
+  useEffect(() => {
+    const loadDefaultScenarios = async () => {
+      try {
+        const response = await fetch('/scenarios.csv');
+        if (!response.ok) {
+          console.log('scenarios.csv not found, skipping auto-load');
+          return;
+        }
+
+        const text = await response.text();
+        if (!text) {
+          console.log('scenarios.csv is empty, skipping auto-load');
+          return;
+        }
+
+        const lines = text.split(/\r?\n/).filter(line => line.trim() !== '');
+        if (lines.length < 2) {
+          console.log('scenarios.csv has insufficient data, skipping auto-load');
+          return;
+        }
+
+        const headerLine = lines[0].trim().split(',');
+        const header = headerLine.map(h => h.trim().toLowerCase().replace(/"/g, ''));
+        const promptIndex = header.indexOf('prompt');
+        const contextIndex = header.indexOf('context');
+
+        if (promptIndex === -1 || contextIndex === -1) {
+          console.log('scenarios.csv missing required columns, skipping auto-load');
+          return;
+        }
+
+        const scenarios: CsvScenario[] = lines.slice(1).map((line, index) => {
+          // Simple CSV parser that handles quoted fields
+          const columns: string[] = [];
+          let current = '';
+          let inQuotes = false;
+
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              columns.push(current.trim());
+              current = '';
+            } else {
+              current += char;
+            }
+          }
+          columns.push(current.trim()); // Don't forget the last column
+
+          return {
+            id: index + 1,
+            context: (columns[contextIndex] || '').replace(/^"|"$/g, ''),
+            prompt: (columns[promptIndex] || '').replace(/^"|"$/g, '')
+          };
+        });
+
+        // Auto-load the scenarios and switch to CSV mode
+        setCsvScenarios(scenarios);
+        setInputMode('csv');
+        console.log(`Auto-loaded ${scenarios.length} scenarios from scenarios.csv`);
+
+      } catch (error) {
+        console.log('Failed to auto-load scenarios.csv:', error);
+        // Silently fail - this is not critical functionality
+      }
+    };
+
+    loadDefaultScenarios();
+  }, []); // Run only once on mount
+
   // Cooldown timer
   useEffect(() => {
     if (cooldown > 0) {
